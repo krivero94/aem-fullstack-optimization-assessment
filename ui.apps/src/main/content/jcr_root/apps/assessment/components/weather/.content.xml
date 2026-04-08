@@ -3,5 +3,4 @@
           xmlns:cq="http://www.day.com/jcr/cq/1.0"
           jcr:primaryType="cq:Component"
           jcr:title="Weather"
-          componentGroup="Assessment - Legacy"/>
-
+          componentGroup="Assessment"/>
