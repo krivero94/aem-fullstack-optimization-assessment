@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>com.assessment</groupId>
         <artifactId>aem-fullstack-optimization-assessment</artifactId>
         <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>assessment.all</artifactId>
@@ -39,6 +40,12 @@
             <version>${project.version}</version>
             <type>zip</type>
         </dependency>
+        <dependency>
+            <groupId>com.assessment</groupId>
+            <artifactId>assessment.core</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -46,41 +53,21 @@
             <plugin>
                 <groupId>org.apache.jackrabbit</groupId>
                 <artifactId>filevault-package-maven-plugin</artifactId>
-                <version>${filevault.package.plugin.version}</version>
                 <extensions>true</extensions>
                 <configuration>
                     <group>assessment</group>
-                    <packageType>container</packageType>
-                    <name>assessment.all</name>
-                    <skipSubPackageValidation>true</skipSubPackageValidation>
-                    <embeddeds>
-                        <embedded>
-                            <groupId>com.assessment</groupId>
-                            <artifactId>assessment.ui.apps.structure</artifactId>
-                            <type>zip</type>
-                            <target>/apps/assessment-packages/application/install</target>
-                        </embedded>
-                        <embedded>
-                            <groupId>com.assessment</groupId>
-                            <artifactId>assessment.ui.apps</artifactId>
-                            <type>zip</type>
-                            <target>/apps/assessment-packages/application/install</target>
-                        </embedded>
-                        <embedded>
-                            <groupId>com.assessment</groupId>
-                            <artifactId>assessment.ui.config</artifactId>
-                            <type>zip</type>
-                            <target>/apps/assessment-packages/application/install</target>
-                        </embedded>
-                        <embedded>
-                            <groupId>com.assessment</groupId>
-                            <artifactId>assessment.ui.content</artifactId>
-                            <type>zip</type>
-                            <target>/apps/assessment-packages/content/install</target>
-                        </embedded>
-                    </embeddeds>
+                    <packageType>content</packageType>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>autoInstallPackage</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
 </project>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.assessment</groupId>
@@ -34,6 +34,21 @@
         <maven.compiler.plugin.version>3.11.0</maven.compiler.plugin.version>
         <maven.bundle.plugin.version>5.1.9</maven.bundle.plugin.version>
         <filevault.package.plugin.version>1.3.6</filevault.package.plugin.version>
+        <sling.maven.plugin.version>2.4.2</sling.maven.plugin.version>
+
+        <aem.host>localhost</aem.host>
+        <aem.port>4502</aem.port>
+        <sling.user>admin</sling.user>
+        <sling.password>admin</sling.password>
+        <vault.user>admin</vault.user>
+        <vault.password>admin</vault.password>
+        <frontend-maven-plugin.version>1.12.0</frontend-maven-plugin.version>
+        <core.wcm.components.version>2.26.0</core.wcm.components.version>
+        <bnd.version>5.1.2</bnd.version>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <buildNumber>${maven.build.timestamp}</buildNumber>
+        <maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
     </properties>
 
     <repositories>
@@ -62,20 +77,36 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>${maven.compiler.plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>${maven.bundle.plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.apache.jackrabbit</groupId>
                     <artifactId>filevault-package-maven-plugin</artifactId>
-                    <version>${filevault.package.plugin.version}</version>
+                    <version>1.3.6</version>
+                    <extensions>true</extensions>
+                </plugin>
+                <plugin>
+                    <groupId>io.wcm.maven.plugins</groupId>
+                    <artifactId>wcmio-content-package-maven-plugin</artifactId>
+                    <version>2.1.2</version>
+                    <configuration>
+                        <serviceURL>http://${aem.host}:${aem.port}/crx/packmgr/service.jsp</serviceURL>
+                        <userId>${vault.user}</userId>
+                        <password>${vault.password}</password>
+                        <bundleStatusWait>false</bundleStatusWait>
+                        <relaxedSSLCheck>true</relaxedSSLCheck>
+                        <retryCount>5</retryCount>
+                        <retryDelaySeconds>10</retryDelaySeconds>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>autoInstallPackage</id>
+            <build>
+
+            </build>
+        </profile>
+
+    </profiles>
 </project>

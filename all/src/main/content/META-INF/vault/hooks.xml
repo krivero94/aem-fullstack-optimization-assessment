@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hooks>
+    <hook type="install" class="org.apache.jackrabbit.vault.packaging.impl.InstallHookProcessor">
+        <processing line="^/apps/assessment-packages/(.*)/install/.*\.zip$" priority="1000">
+            <xpath query="//include[@root='/apps/assessment-packages']" />
+        </processing>
+    </hook>
+</hooks>
