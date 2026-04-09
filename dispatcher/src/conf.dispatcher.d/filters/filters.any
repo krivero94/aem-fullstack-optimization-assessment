@@ -1,8 +1,8 @@
 /filters {
-    /0001 { /type "allow" /method "GET" /url "/content/assessment/*" }
+    /0000 { /type "deny" /url "/*" }
+    /0001 { /type "allow" /method "GET" /url "/content/assessment/*.html" }
+    /0002 { /type "allow" /method "GET" /url "/content/assessment/*.model.json" }
     /0010 { /type "allow" /url "/etc.clientlibs/*" }
     /0020 { /type "allow" /method "GET" /url "/libs/granite/csrf/token.json" }
-    /0030 { /type "allow" /method "POST" /url "/content/assessment/*" /selectors "weather" }
-    /9999 { /type "deny" /url "/*" }
+    /9999 { /type "deny" /url "/content/assessment/us/en/jcr:content*" }
 }
-

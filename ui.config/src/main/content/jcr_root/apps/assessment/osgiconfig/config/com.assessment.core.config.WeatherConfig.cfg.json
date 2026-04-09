@@ -1,5 +1,0 @@
-{
-    "apiKey": "secure-weather-api-key",
-    "endpoint": "https://goweather.xyz/weather/%s",
-    "cacheTtl": 300
-}

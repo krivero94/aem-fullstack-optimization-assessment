@@ -1,32 +1,37 @@
 # Architectural Decisions
 
-## Caching Strategy
-- Used a simple ConcurrentHashMap-based cache with manual expiration check.
-- Cache TTL of 5 minutes to reduce external API calls.
-- Cache key includes city and API key for tenant isolation.
-- This improves performance by avoiding repeated API calls without external dependencies.
+## 1. Caching Strategy (Performance & Resilience)
+- **Implementation**: Utilized a `ConcurrentHashMap` within the `WeatherServiceImpl` to store API responses.
+- **Thread Safety**: Chose `ConcurrentHashMap` to ensure thread-safe operations without the overhead of full synchronization.
+- **TTL Logic**: Implemented a manual expiration check (5-minute default) to ensure data freshness while staying within API rate limits.
+- **Tenant Isolation**: The cache key is a composite of the `city` and `context path`, ensuring that different tenants (sites) don't leak data to one another even if they query the same city.
 
-## Configuration Strategy
-- Implemented Context-Aware Configuration (CAC) for tenant-aware settings.
-- API key and endpoint are configurable per context (e.g., per site).
-- Default config provided in ui.config, but can be overridden in /conf or page-specific configs.
+## 2. Configuration Strategy (Multi-tenancy)
+- **Context-Aware Configuration (CAC)**: Implemented `WeatherConfig` using Sling CAC. This allows different brand sites or country branches (e.g., `/content/site-a` vs `/content/site-b`) to have different API endpoints, keys, or TTL values.
 
-## Dispatcher Hardening
-- Restricted /content/* to /content/assessment/* to limit exposure.
-- Removed /bin/* allow rule as it's not needed.
-- Added deny-all rule at the end.
-- Allowed POST to weather selector for potential future use.
+## 3. Data Transfer & Parsing
+- **DTO Pattern**: Created a `WeatherData` POJO (Plain Old Java Object) to decouple the API's JSON structure from the Sling Model. This makes the system resilient to external API schema changes.
+- **JSON Parsing**: Integrated **Google Gson** for robust serialization. 
+- **Compatibility Note**: Explicitly implemented **Public Getters/Setters** in DTOs to ensure compatibility with Gson's reflection mechanism within the restricted OSGi ClassLoader environment.
 
-## Security Improvements
-- Moved API keys from code and frontend to OSGi config.
-- Used Apache HttpClient for better security and resilience.
-- Removed inline JavaScript from HTL.
+## 4. Sling Models Implementation
+- **Adaptables**: The `WeatherModel` is adaptable from both `SlingHttpServletRequest` and `Resource`, ensuring the component works across different rendering contexts.
+- **Injection Strategy**: Used `DefaultInjectionStrategy.OPTIONAL` to prevent model failure if component properties (like `city`) are missing in the JCR.
+- **Standard Injection**: Relied on `@Inject` for service and property acquisition, ensuring a clean and readable model structure.
+- **Initialization**: Logic is encapsulated in a `@PostConstruct init()` method, ensuring data fetching and parsing occur exactly once per request.
+- **Resilience**: Implemented error handling within the initialization. If the service fails or the JSON is malformed, the model fails gracefully, allowing the HTL to display a "data unavailable" message instead of breaking the page layout.
 
-## Performance Improvements
-- Added caching to avoid repeated API calls.
-- Used HttpClient with proper error handling.
+## 5. Security & Dispatcher Hardening
+- **API Key Protection**: Moved sensitive keys from the frontend and hardcoded constants to **CAC (Context-Aware Cloud Config)**, ensuring they are never exposed in the client-side DOM.
+- **Dispatcher**: 
+    - Applied a **"Deny by Default"** strategy.
+    - Path restriction: Specifically allowed only the assessment content path (`/content/assessment/*.html`) and its model representation (`*.model.json`),
+    - JCR Protection: Added an explicit deny rule for `jcr:content` properties (`/9999`) to prevent the exposure of internal node metadata to end-users.
 
-## Assumptions
-- The external weather API is reliable; added basic error handling.
-- Tenant config is managed via AEM's CAC mechanism.
-- No authentication needed for the API in this refactor.
+## 6. Testing Strategy
+- **Unit Testing**: Implemented JUnit 4 and Mockito tests to validate the core service logic.
+- **Mocking Strategy**: Used `MockitoJUnitRunner` to mock Sling `Resource` and `ConfigurationBuilder` objects.
+- **Validation**: Tests specifically verify the **CAC resolution process**, ensuring the service correctly adapts the resource to retrieve configuration before attempting API calls.
+
+## 7. Assumptions & Trade-offs
+- **Error Handling**: When the API fails, the system returns a graceful "Unavailable" message instead of breaking the page layout.

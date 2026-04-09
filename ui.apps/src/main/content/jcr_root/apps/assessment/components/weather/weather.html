@@ -1,8 +1,21 @@
-<sly data-sly-use.weatherModel="com.assessment.core.models.WeatherModel"></sly>
-<div class="cmp-weather" data-city="${weatherModel.city @ context='attribute'}">
-    <h2>${weatherModel.pageTitle @ context='html'}</h2>
-    <div class="cmp-weather__data">
-        <p>Weather for ${weatherModel.city}:</p>
-        <pre>${weatherModel.weatherJson @ context='html'}</pre>
+<div class="cmp-weather" data-sly-use.model="com.assessment.core.models.WeatherModel">
+    <h2 class="cmp-weather__title">Weather Forecast</h2>
+    
+    <div data-sly-test="${model.weatherData}" class="cmp-weather__content">
+        <div class="cmp-weather__current">
+            <p>City: <strong>${model.city}</strong></p>
+            <p>Temperature: <strong>${model.weatherData.temperature}</strong></p>
+            <p>Status: ${model.weatherData.description}</p>
+        </div>
+
+        <div class="cmp-weather__forecast" data-sly-list.item="${model.weatherData.forecast}">
+            <div class="cmp-weather__day">
+                <span>Day ${item.day}: ${item.temperature} - ${item.wind}</span>
+            </div>
+        </div>
+    </div>
+    
+    <div data-sly-test="${!model.weatherData}" class="cmp-weather__error">
+        <p>Weather data currently unavailable.</p>
     </div>
 </div>

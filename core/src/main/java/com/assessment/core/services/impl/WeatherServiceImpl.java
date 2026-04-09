@@ -37,6 +37,7 @@ public class WeatherServiceImpl implements WeatherService {
 
     @Override
     public String getForecast(String city, Resource resource) throws IOException {
+        // Context aware
         WeatherConfig config = resource.adaptTo(ConfigurationBuilder.class)
                 .as(WeatherConfig.class);
         String apiKey = config.apiKey();
